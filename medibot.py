@@ -7,17 +7,70 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import io
+import requests
+import json
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
-from langchain_huggingface import HuggingFaceEndpoint
+from langchain.llms.base import LLM
+from typing import Any, List, Mapping, Optional
 
 ## Uncomment the following files if you're not using pipenv as your virtual environment manager
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
+
+# Define Gemini LLM class
+class GeminiLLM(LLM):
+    gemini_api_key: str
+    model_name: str = "gemini-2.0-flash"
+    temperature: float = 0.5
+    max_tokens: int = 512
+    
+    @property
+    def _llm_type(self) -> str:
+        return "gemini"
+    
+    def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.gemini_api_key}"
+        headers = {"Content-Type": "application/json"}
+        data = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }]
+        }
+        
+        if self.temperature is not None:
+            data["generationConfig"] = {"temperature": self.temperature}
+        
+        if self.max_tokens is not None:
+            if "generationConfig" not in data:
+                data["generationConfig"] = {}
+            data["generationConfig"]["maxOutputTokens"] = self.max_tokens
+        
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        
+        if response.status_code != 200:
+            raise ValueError(f"Error from Gemini API: {response.text}")
+        
+        response_json = response.json()
+        
+        # Extract the generated text from the response
+        try:
+            generated_text = response_json["candidates"][0]["content"]["parts"][0]["text"]
+            return generated_text
+        except (KeyError, IndexError) as e:
+            raise ValueError(f"Unexpected response format from Gemini API: {str(e)}")
+    
+    @property
+    def _identifying_params(self) -> Mapping[str, Any]:
+        return {
+            "model_name": self.model_name,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens
+        }
 
 
 DB_FAISS_PATH="vectorstore/db_faiss"
@@ -33,12 +86,15 @@ def set_custom_prompt(custom_prompt_template):
     return prompt
 
 
-def load_llm(huggingface_repo_id, HF_TOKEN):
-    llm=HuggingFaceEndpoint(
-        repo_id=huggingface_repo_id,
+def load_llm():
+    # Get the Gemini API key from environment variables
+    gemini_api_key = os.environ.get("GEMINI_API_KEY", "AIzaSyA3Pd3lpzpvFmSaczIIvPzOU-6m1tujg7Q")
+    
+    # Create and return the Gemini LLM
+    llm = GeminiLLM(
+        gemini_api_key=gemini_api_key,
         temperature=0.5,
-        model_kwargs={"token":HF_TOKEN,
-                      "max_length":"512"}
+        max_tokens=512
     )
     return llm
 
@@ -380,9 +436,6 @@ def main():
                     Start the answer directly. No small talk please.
                     """
             
-            HUGGINGFACE_REPO_ID="mistralai/Mistral-7B-Instruct-v0.3"
-            HF_TOKEN=os.environ.get("HF_TOKEN")
-
             try: 
                 # Show a spinner while loading the vector store
                 with st.spinner("Searching medical knowledge..."):
@@ -391,9 +444,9 @@ def main():
                         st.error("Failed to load the vector store")
                 
                 # Show a spinner while generating the response
-                with st.spinner("Generating response..."):
+                with st.spinner("Generating response with Google Gemini..."):
                     qa_chain=RetrievalQA.from_chain_type(
-                        llm=load_llm(huggingface_repo_id=HUGGINGFACE_REPO_ID, HF_TOKEN=HF_TOKEN),
+                        llm=load_llm(),
                         chain_type="stuff",
                         retriever=vectorstore.as_retriever(search_kwargs={'k':3}),
                         return_source_documents=True,

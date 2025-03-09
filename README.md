@@ -44,7 +44,7 @@ MediBot is an AI-powered medical assistant that uses Retrieval-Augmented Generat
    - Updatable knowledge base
 
 3. **LLM Integration**:
-   - Mistral-7B-Instruct-v0.3 via HuggingFace
+   - Google Gemini 2.0 Flash API for response generation
    - Custom prompt templates
    - RetrievalQA chain implementation
 
@@ -84,9 +84,9 @@ MediBot is an AI-powered medical assistant that uses Retrieval-Augmented Generat
 
 4. Set up environment variables:
    - Create a `.env` file in the project root
-   - Add your HuggingFace API token:
+   - Add your Google Gemini API key:
      ```
-     HF_TOKEN=your_huggingface_token
+     GEMINI_API_KEY=your_gemini_api_key
      ```
 
 5. Prepare your data:
@@ -131,7 +131,8 @@ medical-chatbot/
 - **LangChain**: Framework for building LLM applications
 - **Streamlit**: Web application framework
 - **FAISS**: Vector database for similarity search
-- **HuggingFace**: For embeddings and LLM inference
+- **Google Gemini API**: For generating responses
+- **HuggingFace**: For embeddings
 - **PyPDF2**: For PDF text extraction
 - **Pandas & Matplotlib**: For data visualization
 
@@ -150,7 +151,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - The Gale Encyclopedia of Medicine
 - Davidson's Principles and Practice of Medicine
-- HuggingFace for providing access to state-of-the-art language models
+- Google for providing access to the Gemini API
 - The LangChain community for the excellent RAG framework
 
 ---
