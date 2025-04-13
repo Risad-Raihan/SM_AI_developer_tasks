@@ -1,0 +1,21 @@
+# Use Python 3.11 slim image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Install minimal dependencies
+RUN pip install --no-cache-dir fastapi==0.115.12 uvicorn==0.34.0 pydantic==2.11.3
+
+# Copy only the demo app
+COPY demo_app.py .
+
+# Expose port
+EXPOSE 8000
+
+# Command to run the application
+CMD ["python", "demo_app.py"] 
