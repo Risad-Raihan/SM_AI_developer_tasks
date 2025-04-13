@@ -1,9 +1,14 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -15,36 +20,43 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
-# Virtual Environment
+# Virtual environment
 .env
 .venv
-env/
 venv/
 ENV/
-env.bak/
-venv.bak/
 
-# IDE
+# IDE specific files
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# Project specific
+# Exclude large directories
+vectorstore/
+.vectorstore/
+.DS_Store
+
+# Large files
+*.faiss
+*.pkl
+*.zip
+
+# Logs
+logs/
+*.log
 
 # Streamlit
 .streamlit/
 
 # Data files
 data/*.pdf
-vectorstore/
-
-# Logs
-*.log
+wheels/
 
 # OS specific
-.DS_Store
 Thumbs.db 

@@ -232,3 +232,84 @@ The chatbot uses the following NLP components:
 1. **Intent Recognition**: Identifies the purpose of the user's message
 2. **RAG (Retrieval Augmented Generation)**: Retrieves relevant information and generates responses
 3. **Embedding Model**: Converts text to vector embeddings for semantic search 
+
+## Docker Deployment
+
+The Savory Haven Restaurant Chatbot is containerized using Docker for easy deployment and scalability.
+
+### Docker Configuration
+
+The project includes the following Docker-related files:
+- **Dockerfile**: Contains instructions for building the application container
+- **Dockerfile.demo**: A streamlined version for demonstration purposes
+- **docker-compose.yml**: Orchestrates the application and MongoDB services
+
+### Building and Running with Docker
+
+The application can be built and run using Docker with these commands:
+
+```
+# Build the Docker image
+docker build -t savory-haven-demo -f Dockerfile.demo .
+
+# Run the container
+docker run -d -p 8000:8000 --name savory-haven-app savory-haven-demo
+```
+
+Alternatively, using Docker Compose:
+
+```
+# Build and start services
+docker compose up -d
+
+# Check logs
+docker compose logs app
+
+# Stop services
+docker compose down
+```
+
+### Docker Architecture
+
+The Docker setup includes:
+- **Web Service Container**: Running the FastAPI application
+- **MongoDB Container**: For persistent data storage
+- **Volume Mapping**: For vector store persistence
+
+## Render Deployment
+
+The Savory Haven Restaurant Chatbot is deployed on Render, a cloud platform for hosting web services.
+
+### Deployment Configuration
+
+The application is deployed with these settings:
+- **Service Type**: Web Service
+- **Environment**: Docker
+- **Region**: Oregon (US West)
+- **Branch**: main
+- **Instance Type**: Free
+- **Health Check Path**: /health
+- **Dockerfile Path**: ./Dockerfile.demo
+
+### Live Deployment
+
+The application is deployed and accessible at:
+
+```
+https://savory-haven-chatbot.onrender.com
+```
+
+API endpoints:
+- **API Documentation**: [https://savory-haven-chatbot.onrender.com/docs](https://savory-haven-chatbot.onrender.com/docs)
+- **Health Check**: [https://savory-haven-chatbot.onrender.com/health](https://savory-haven-chatbot.onrender.com/health)
+- **Chat Endpoint**: `https://savory-haven-chatbot.onrender.com/api/chat` (POST)
+
+### Deployment Screenshots
+
+The application has been successfully deployed on Render and is fully operational, as shown in the Swagger UI screenshots above.
+
+## Conclusion
+
+The Savory Haven Restaurant Chatbot provides a robust API for interacting with a restaurant conversational AI system. It handles various user intents related to restaurant operations, provides contextual responses, and offers suggested actions to enhance the user experience.
+
+The system is built with scalability in mind, uses modern NLP techniques, and is deployed using Docker and Render for reliability and ease of maintenance. 
